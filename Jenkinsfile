@@ -20,8 +20,8 @@ pipeline {
 
         stage('Kubernetes Deploy') {
             steps {
-                // 쿠버네티스 이미지 업데이트 명령어에도 동일하게 적용
-                sh 'kubectl set image deployment/reporting-server-app reporting-server-app=reporting-server:${BUILD_NUMBER}'
+                // 컨테이너 이름을 reporting-server로 정확하게 지정
+                sh 'kubectl set image deployment/reporting-server-app reporting-server=reporting-server:${BUILD_NUMBER}'
             }
         }
     }
