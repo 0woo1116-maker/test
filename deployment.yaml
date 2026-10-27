@@ -15,7 +15,7 @@ spec:
       containers:
       - name: reporting-server
         image: reporting-server:v1
-        imagePullPolicy: Never  # 로컬에 빌드된 이미지를 우선 사용하도록 설정
+        imagePullPolicy: IfNotPresent  # 로컬에 빌드된 이미지를 우선 사용하도록 설정
         ports:
         - containerPort: 8080
 ---
