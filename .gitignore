@@ -1,0 +1,5 @@
+# logs & temp
+logs/
+*.log
+temp/
+work/
