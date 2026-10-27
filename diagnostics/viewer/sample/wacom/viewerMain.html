@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Wacom Mirroring Viewer</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=11" /> 
+		<script src="../../js/jquery-3.5.1.min.js"></script>
+		<script src="../../js/crownix-viewer.storage.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="../../css/crownix-viewer.min.css">
+	</head>
+	<body style="margin:0px; padding:0px;">
+		<div id="crownix-viewer" style="position:absolute; width:100%; height:100%;"></div>
+		<script>
+			var serverUrl = ''; 
+			var infoTalkUrl = '';
+			var viewerOptions = {};
+			var openFileOptions = {mirroring: {enable: true}};
+			
+			/******************* [Start of Mirroring Code] *******************/
+			// 미러링 프로그램의이 사용하는 코드 입니다. 아래 코드를 수정하지 마세요.
+			// 수정할 경우 프로그램이 동작하지 않을 수 있습니다.
+			var Util = m2soft.crownix.Util;
+			var DELIM = '\u0003';
+			var viewer;
+			
+			serverUrl = serverUrl || Util.getUrlVar('server_url');
+			infoTalkUrl = infoTalkUrl || Util.getUrlVar('submit_url');
+
+			// IE 사용 시 활성화 필요함
+			// m2soft.crownix.Util.ActionEvents = {
+			// 	start: 'mousedown',
+			// 	move: 'mousemove',
+			// 	end: 'mouseup',
+			// 	out: 'mouseout',
+			// 	over: 'mouseover'
+			// };
+			
+			$(document).ready(function(){
+
+				viewer = new m2soft.crownix.Viewer(serverUrl, 'crownix-viewer', viewerOptions);
+				
+				try {
+					customFunction();
+				} catch(err) {
+					new m2soft.crownix.MirroringManager().externalEvent.returnReportFinished(err);
+				}
+				
+				viewer.bind('report-finished', function(e) {
+					new m2soft.crownix.MirroringManager().externalEvent.returnReportFinished(e);
+				});
+			});
+			/******************* [End of Mirroring Code] *******************/
+			
+			// 고객사에서 필요한 스크립트는 이 곳에 추가 작성 하세요.
+			var customFunction = function() {
+				
+				// 제출 완료 후 데이터 전송
+				viewer.bind('submit-finished', function(e) {
+
+					if(e.status){
+						
+						var formData = viewer.getFormDataValue();
+						
+						// menu_id, tran_dcd 추가
+						var appendData = 
+							DELIM + 'METADATA' + DELIM + 'menu_id' + DELIM + 'tf' + DELIM + Util.getUrlVar('menu_id') + 
+							DELIM + 'METADATA' + DELIM + 'tran_dcd' + DELIM + 'tf' + DELIM + Util.getUrlVar('tran_dcd');
+							
+						window.external.HandlerSubmitFinished('1' + formData + appendData);
+					}
+					else 
+						window.external.HandlerSubmitFinished('0' + DELIM + e.message);
+				});
+				
+				// 제출버튼 등록
+				var submitButton = {
+					id: 'submit',
+					svg: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 26 26" enable-background="new 0 0 26 26">  <path d="m.3,14c-0.2-0.2-0.3-0.5-0.3-0.7s0.1-0.5 0.3-0.7l1.4-1.4c0.4-0.4 1-0.4 1.4,0l.1,.1 5.5,5.9c0.2,0.2 0.5,0.2 0.7,0l13.4-13.9h0.1v-8.88178e-16c0.4-0.4 1-0.4 1.4,0l1.4,1.4c0.4,0.4 0.4,1 0,1.4l0,0-16,16.6c-0.2,0.2-0.4,0.3-0.7,0.3-0.3,0-0.5-0.1-0.7-0.3l-7.8-8.4-.2-.3z"/></svg>',
+					title: '제출',
+					handler: function() {
+						viewer.submit(infoTalkUrl, 'dummy', '100000');	// DataSource, Service 코드 확인 필요
+					}
+				};
+				
+				viewer.addToolbarItem(submitButton);
+
+			    // 닫기버튼 등록
+				var closeButton = {
+				    id: 'closeForm',
+				    svg: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 26 26" enable-background="new 0 0 26 26">  <path d="m.3,14c-0.2-0.2-0.3-0.5-0.3-0.7s0.1-0.5 0.3-0.7l1.4-1.4c0.4-0.4 1-0.4 1.4,0l.1,.1 5.5,5.9c0.2,0.2 0.5,0.2 0.7,0l13.4-13.9h0.1v-8.88178e-16c0.4-0.4 1-0.4 1.4,0l1.4,1.4c0.4,0.4 0.4,1 0,1.4l0,0-16,16.6c-0.2,0.2-0.4,0.3-0.7,0.3-0.3,0-0.5-0.1-0.7-0.3l-7.8-8.4-.2-.3z"/></svg>',
+				    title: '닫기',
+				    handler: function () {
+				        window.external.Close();
+				    }
+				};
+
+				viewer.addToolbarItem(closeButton);
+			};
+			
+		</script>
+	</body>
+</html>
+
+

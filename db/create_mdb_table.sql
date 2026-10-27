@@ -1,0 +1,51 @@
+CREATE TABLE ERS_SCHEDULE_DELIVERY
+(
+   DELIVERY_NAME varchar(50),
+   GROUP_NAME varchar(50),
+   SETTING memo
+);
+
+CREATE TABLE ERS_SCHEDULE_TASK
+(
+   TASK_NAME varchar(50) PRIMARY KEY NOT NULL,
+   GROUP_NAME varchar(50),
+   REQUEST memo
+);
+
+CREATE TABLE ERS_SCHEDULE_TASKGROUP
+(   GROUP_NAME varchar(50) PRIMARY KEY NOT NULL,
+   SCHEDULE memo,
+   STARTTIME timestamp ,
+   ENDTYPE varchar(100),
+   ENDOPTION varchar(100),
+   DESCRIPTION memo,
+   ENABLE number
+);
+
+CREATE TABLE ERS_SCHEDULE_TASKHISTORY
+(
+   GROUP_NAME varchar(50) NOT NULL,
+   LASTUPDATEDATE timestamp  NOT NULL,
+   STATUS memo,
+   DESCRIPTION memo
+);
+
+CREATE TABLE ERS_ERROR_REQUESTINFO
+(
+	STATUS varchar(6),
+	RDID varchar(30) NOT NULL,
+	OPCODE varchar(10),
+	MRD_PARAM varchar(4000),
+	MRD_PATH varchar(4000)
+);
+
+CREATE TABLE ERS_ERROR
+(
+	RDID varchar(30),
+	IN_DATE varchar(40),
+	ERROR_POSITION varchar(1000),
+	ERROR_MSG varchar(1000),
+	STACK_TRACE memo,
+	ERROR_LEVEL varchar(10)
+);
+

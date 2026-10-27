@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html style="margin:0;height:100%">
+	<head>
+		<meta charset="utf-8">
+		<title>diagnostics viewer</title>
+		<script src="./js/jquery-3.5.1.min.js"></script>
+		<script src="./js/crownix-viewer.storage.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="./css/crownix-viewer.min.css">
+	</head>
+	<body style="margin:0;height:100%">
+		<div id="crownix-viewer" style="position:absolute;width:100%;height:100%"></div>
+		<script>
+
+			function getQueryParams()
+			{
+				var params = {};
+				var queryString = window.location.search.substring(1);
+				var queryArray = queryString.split("&");
+				for (var i = 0; i < queryArray.length; i++)
+				{
+					var pair = queryArray[i].split("=");
+					params[pair[0]] = decodeURIComponent(pair[1]);
+				}
+				return params;
+			}
+
+			var pdfBtnItem = {
+				index: 99,
+				id: 'pdfBtn',
+				svg: '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 24 24" enable-background="new 0 0 24 24" xml:space="preserve" focusable="false"><path fill="none" stroke="#85929E" stroke-width="1" stroke-miterlimit="10" d="M0.505,2.993v17.424c0,0-0.196,3.083,3.278,3.083	c3.473,0,16.858,0,16.858,0s2.856-0.221,2.856-2.688c0-2.463,0-17.819,0-17.819s0.234-2.488-2.645-2.488c-2.881,0-17.797,0-17.797,0	S0.505,0.262,0.505,2.993z"></path><path fill="#E41737" stroke="#E41737" stroke-width="0.2" stroke-miterlimit="10" d="M11.549,9.045c0,0-4.489,10.481-7.78,11.242	c0,0-0.171-1.122,2.911-3.31c0,0-3.005,1.294-3.386,3.12c0,0,0.095,0.476,1.198,0.438c0,0,0.932,0.19,4.014-4.261	c0,0,0.026-0.04,0.075-0.114c0.44-0.678,2.685-4.181,3.216-6.049c0,0,1.121,2.929,3.252,4.47c0,0-4.311,0.605-6.624,1.641	l-0.072,0.1c0,0,3.652-1.17,7.39-1.298c0,0,4.337,2.254,5.065,0.998v-0.057c0,0-0.999,0.442-3.867-0.999	c0,0,4.052-0.171,3.938,0.828c0,0,0.756-0.757-1.256-1.228c0,0-2.026-0.229-3.566-0.1c0,0-2.994-1.228-3.901-5.521	c0,0,0.563-2.839,0.505-3.923L11.92,7.847c0,0-0.711-3.41,0.236-4.223c0,0,0.392,0.1,0.563,1.027c0,0,0.458-1.084-0.563-1.17	c0,0-0.764-0.257-0.893,1.127C11.264,4.608,10.955,7.21,11.549,9.045z"></path></svg>',
+				title: 'Download PDF',
+				separator: false,
+				handler: function() {
+					var link = document.createElement('a');
+					link.href = pdfPath;
+					link.download = pdfPath.substring(pdfPath.lastIndexOf('/') + 1);
+					link.click();
+				}
+			};
+
+			var pdfPath;
+
+			window.onload = function() {
+				var params = getQueryParams();
+				var url = params.serverUrl;
+				var diagnosticsDir = params.diagnosticsDir;
+				var taskName = params.taskName;
+				var exportName = params.exportName;
+
+				var resultFilePath = url + diagnosticsDir + "/" + taskName + "/" + exportName;
+				var mmlPath = resultFilePath + ".mml";
+				pdfPath = resultFilePath + ".pdf";
+
+				var viewer = new m2soft.crownix.Viewer(url + '/service', 'crownix-viewer');
+				viewer.hideToolbarItem(["first", "save", "last", "print", "print_pdf", "search", "inquery", "cancel"]);
+				viewer.addToolbarItem(pdfBtnItem);
+
+				fetch(mmlPath)
+						.then(function(response) {
+							if (!response.ok)
+							{
+								return response.text().then(function(errorText) {
+									throw new Error('HTTP status code:' + response.status + "\n" + errorText);
+								});
+							}
+							return response.text();
+						})
+						.then(function(mml){
+							viewer.importMML({
+								'mml': mml,
+								'mrd_path': url + "diagnostics/diagnostics.mrd"
+
+							});
+
+						})
+						.catch(function(error) {
+							alert('Failed to load MML file: ' + error.message);
+						});
+			};
+		</script>
+	</body>
+</html>

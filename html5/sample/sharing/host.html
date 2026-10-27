@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html style="margin:0;height:100%">
+	<head>
+		<meta charset="utf-8">
+		<title>Crownix HTML5 Viewer</title>
+		<script src="../../js/jquery-3.5.1.min.js"></script>
+		<script src="../../js/crownix-viewer.min.js"></script>
+		<script src="../../js/share/node_modules/socket.io-client/socket.io.js"></script>
+		<link rel="stylesheet" type="text/css" href="../../css/crownix-viewer.min.css">
+	</head>
+	<body style="margin:0;height:100%">
+		<div id="crownix-viewer" style="position:absolute;width:100%;height:100%"></div>
+		<script>
+			var serverUrl = '';
+			var infoTalkUrl = '';
+			var viewerOptions = {
+				share: {
+					url: "http://localhost:52280",
+					scanType: ['stamp'],
+					cluster: 2,
+					route: m2soft.crownix.Util.getUrlVar('reportName')
+				}
+			};
+			var openFileOptions = {};		// 오픈파일 옵션. 변수명 수정하지 말 것.
+			var createRoomOptions = {
+				hideLock: true,
+				pageSync: true,
+				unlock: true,
+				useSync: true
+			};		// 쉐어링 createRoom 옵션. 변수명 수정하지 말 것.
+
+			var Util = m2soft.crownix.Util;
+			var viewer;
+			var dialog = new m2soft.crownix.FormDialog("#crownix-viewer");
+
+			serverUrl = serverUrl || Util.getUrlVar('server_url');
+			infoTalkUrl = infoTalkUrl || Util.getUrlVar('submit_url');
+
+			$(document).ready(function () {
+				viewer = new m2soft.crownix.Viewer(serverUrl, 'crownix-viewer',viewerOptions);
+
+				viewer.bind("report-finished",function(e){
+					sharingexternal.ReturnSharingFinished(e);
+				});
+				viewer.bind('sharing-finished', function(e) {
+					sharingexternal.ReturnSharingFinished(e);
+				});
+				viewer.bind('submit-finished',function(e) {
+					sharingexternal.ReturnSharingFinished(e);
+				});
+				viewer.bind('sharing-user-out', function () {
+					dialog.show('고객이 나갔습니다. 고객 재접속 요청이 필요합니다.');
+				});
+			});
+		</script>
+	</body>
+</html>

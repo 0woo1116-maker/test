@@ -1,0 +1,67 @@
+[
+log_version=8.0
+server_name=ERS Reporting Server
+server_version=8.2.2.354
+jbre_version=8.2.3.646
+customer_name=Unkonwn - null
+user.dir=C:\Users\M2S\Desktop\ReportingServer\bin
+os.name=Windows 10
+os.version=10.0
+java.version=1.8.0_202
+java.vm.version=25.202-b08
+java.vm.vendor=Oracle Corporation
+java.vm.name=Java HotSpot(TM) 64-Bit Server VM
+java.home=C:\Program Files\Java\jdk1.8.0_202\jre
+java.class.path=.;ers-daemon.jar;ers-common.jar;jetty\ant-1.6.5.jar;jetty\core-3.1.1.jar;jetty\jetty-6.1.26.jar;jetty\jetty-util-6.1.26.jar;jetty\jsp-2.1-glassfish-2.1.v20091210.jar;jetty\jsp-2.1-jetty-6.1.26.jar;jetty\jsp-api-2.1-glassfish-2.1.v20091210.jar;jetty\servlet-api-2.5-20081211.jar;
+file.encoding=MS949
+user.language=ko
+]
+
+[2026-09-28 10:47:16.510][ERROR][m2soft.ers.report.core.Server.initializeServer(Server.java:83)]m2soft.ers.common.ERSException: [ERS-10002] 서버의 라이선스 파일을 찾을 수 없습니다.(C:\Users\M2S\Desktop\ReportingServer\license\license)
+	at m2soft.ers.report.core.license.License.checkLicense(License.java:63)
+	at m2soft.ers.report.core.Server.checkLicense(Server.java:273)
+	at m2soft.ers.report.core.Server.initializeServer(Server.java:73)
+	at m2soft.ers.report.core.Server.startUp(Server.java:59)
+	at m2soft.ers.report.core.servlet.RDContextListener.contextInitialized(RDContextListener.java:19)
+	at org.mortbay.jetty.handler.ContextHandler.startContext(ContextHandler.java:549)
+	at org.mortbay.jetty.servlet.Context.startContext(Context.java:136)
+	at org.mortbay.jetty.webapp.WebAppContext.startContext(WebAppContext.java:1282)
+	at org.mortbay.jetty.handler.ContextHandler.doStart(ContextHandler.java:518)
+	at org.mortbay.jetty.webapp.WebAppContext.doStart(WebAppContext.java:499)
+	at org.mortbay.component.AbstractLifeCycle.start(AbstractLifeCycle.java:50)
+	at org.mortbay.jetty.handler.HandlerWrapper.doStart(HandlerWrapper.java:130)
+	at org.mortbay.jetty.Server.doStart(Server.java:224)
+	at org.mortbay.component.AbstractLifeCycle.start(AbstractLifeCycle.java:50)
+	at m2soft.ers.daemon.StartUp.main(StartUp.java:52)
+[2026-09-28 10:48:30.100][ERROR][m2soft.ers.report.core.Server.initializeServer(Server.java:83)]m2soft.ers.common.ERSException: [ERS-10002] 서버의 라이선스 파일을 찾을 수 없습니다.(C:\Users\M2S\Desktop\ReportingServer\license\license)
+	at m2soft.ers.report.core.license.License.checkLicense(License.java:63)
+	at m2soft.ers.report.core.Server.checkLicense(Server.java:273)
+	at m2soft.ers.report.core.Server.initializeServer(Server.java:73)
+	at m2soft.ers.report.core.Server.startUp(Server.java:59)
+	at m2soft.ers.report.core.servlet.RDContextListener.contextInitialized(RDContextListener.java:19)
+	at org.mortbay.jetty.handler.ContextHandler.startContext(ContextHandler.java:549)
+	at org.mortbay.jetty.servlet.Context.startContext(Context.java:136)
+	at org.mortbay.jetty.webapp.WebAppContext.startContext(WebAppContext.java:1282)
+	at org.mortbay.jetty.handler.ContextHandler.doStart(ContextHandler.java:518)
+	at org.mortbay.jetty.webapp.WebAppContext.doStart(WebAppContext.java:499)
+	at org.mortbay.component.AbstractLifeCycle.start(AbstractLifeCycle.java:50)
+	at org.mortbay.jetty.handler.HandlerWrapper.doStart(HandlerWrapper.java:130)
+	at org.mortbay.jetty.Server.doStart(Server.java:224)
+	at org.mortbay.component.AbstractLifeCycle.start(AbstractLifeCycle.java:50)
+	at m2soft.ers.daemon.StartUp.main(StartUp.java:52)
+[2026-09-28 10:49:46.244][ERROR][m2soft.ers.report.core.Server.initializeServer(Server.java:83)]m2soft.ers.common.ERSException: [ERS-10002] 서버의 라이선스 파일을 찾을 수 없습니다.(C:\Users\M2S\Desktop\ReportingServer\license\license)
+	at m2soft.ers.report.core.license.License.checkLicense(License.java:63)
+	at m2soft.ers.report.core.Server.checkLicense(Server.java:273)
+	at m2soft.ers.report.core.Server.initializeServer(Server.java:73)
+	at m2soft.ers.report.core.Server.startUp(Server.java:59)
+	at m2soft.ers.report.core.servlet.RDContextListener.contextInitialized(RDContextListener.java:19)
+	at org.mortbay.jetty.handler.ContextHandler.startContext(ContextHandler.java:549)
+	at org.mortbay.jetty.servlet.Context.startContext(Context.java:136)
+	at org.mortbay.jetty.webapp.WebAppContext.startContext(WebAppContext.java:1282)
+	at org.mortbay.jetty.handler.ContextHandler.doStart(ContextHandler.java:518)
+	at org.mortbay.jetty.webapp.WebAppContext.doStart(WebAppContext.java:499)
+	at org.mortbay.component.AbstractLifeCycle.start(AbstractLifeCycle.java:50)
+	at org.mortbay.jetty.handler.HandlerWrapper.doStart(HandlerWrapper.java:130)
+	at org.mortbay.jetty.Server.doStart(Server.java:224)
+	at org.mortbay.component.AbstractLifeCycle.start(AbstractLifeCycle.java:50)
+	at m2soft.ers.daemon.StartUp.main(StartUp.java:52)

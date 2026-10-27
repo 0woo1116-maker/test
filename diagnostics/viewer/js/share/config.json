@@ -1,0 +1,15 @@
+{
+	"server": {
+		"port": 52280,
+		"opts": {
+			"pingInterval": 60000,
+			"pingTimeout" : 210000
+		},
+		"log" : {
+			"level" : "4",
+			"dir" : "./logs",
+			"timestamp" : "YYYY-MM-DD HH:mm:ss",
+			"maxFiles" : "100"
+		}
+	}
+}

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html style="margin:0;height:100%">
+	<head>
+		<meta charset="utf-8">
+		<title>Crownix HTML5 Viewer</title>
+		<script src="../../js/jquery-3.5.1.min.js"></script>
+		<script src="../../js/crownix-viewer.min.js"></script>
+		<script src="../../js/share/node_modules/socket.io-client/socket.io.js"></script>
+		<link rel="stylesheet" type="text/css" href="../../css/crownix-viewer.min.css">
+	</head>
+	<body style="margin:0;height:100%">
+		<div id="crownix-viewer" style="position:absolute;width:100%;height:100%"></div>
+		<script>
+			var viewer;
+			var viewerOptions = {
+				share: {
+					url: "http://localhost:52280",
+					scanType: ['stamp'],
+					cluster: 2,
+					route: m2soft.crownix.Util.getUrlVar('reportName')
+				}
+			};
+			//var openFileOptions;
+			$(document).ready(function () {
+				viewer = new m2soft.crownix.Viewer('', 'crownix-viewer',viewerOptions);
+
+				viewer.bind('report-finished',function(result) {
+					sharingexternal.ReturnSharingFinished(result);
+				});
+			});
+		</script>
+	</body>
+</html>
