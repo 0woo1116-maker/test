@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
       - name: reporting-server
-        image: reporting-server:latest  # Jenkinsfile에서 sed로 동적 치환됨
-        imagePullPolicy: Always         # <--- 매번 최신 태그 이미지를 강제로 강제 풀링하도록 수정
+        image: reporting-server:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
 ---
