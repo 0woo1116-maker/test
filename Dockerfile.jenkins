@@ -1,0 +1,15 @@
+FROM jenkins/jenkins:lts
+
+# 루트 권한으로 전환 후 도커 CLI와 kubectl을 미리 설치
+USER root
+
+# 1. 도커 CLI 설치
+RUN apt-get update && apt-get install -y curl && \
+    curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh
+
+# 2. kubectl 최신버전 설치
+RUN curl -LO "https://dl.k8s.io/release/v1.28.0/bin/linux/amd64/kubectl" && \
+    chmod +x kubectl && mv kubectl /usr/local/bin/kubectl
+
+# 다시 젠킨스 기본 유저로 복귀
+USER jenkins
