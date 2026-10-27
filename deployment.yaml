@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
       - name: reporting-server
-        image: reporting-server:v1
-        imagePullPolicy: IfNotPresent  # 로컬에 빌드된 이미지를 우선 사용하도록 설정
+        image: reporting-server:latest  # Jenkinsfile에서 sed로 동적 치환됨
+        imagePullPolicy: Always         # <--- 매번 최신 태그 이미지를 강제로 강제 풀링하도록 수정
         ports:
         - containerPort: 8080
 ---

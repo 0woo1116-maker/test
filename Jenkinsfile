@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Docker Build') {
             steps {
-                // 싱글 쿼테이션과 셸 표준 문법 사용
+                // 싱글 쿼테이션 안에서 ${BUILD_NUMBER}가 정상 확장됩니다
                 sh 'docker build --no-cache -t reporting-server:${BUILD_NUMBER} .'
             }
         }
@@ -20,8 +20,13 @@ pipeline {
 
         stage('Kubernetes Deploy') {
             steps {
-                // 컨테이너 이름을 reporting-server로 정확하게 지정
-                sh 'kubectl set image deployment/reporting-server-app reporting-server=reporting-server:${BUILD_NUMBER}'
+                script {
+                    // deployment.yaml 안의 이미지 태그를 현재 빌드 번호로 동적 변경 (변수명 통일)
+                    sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
+                    
+                    // Always 정책이 적용된 yaml 파일을 쿠버네티스에 반영
+                    sh "kubectl apply -f deployment.yaml"
+                }
             }
         }
     }
