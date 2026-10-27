@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<license>
+	<supplyNumber>
+		M2Soft-261027-0115-0115-0166
+	</supplyNumber>
+	<serial>
+		5C7B-BCEF-1A2A-FDD7
+	</serial>
+	<generatedBy>
+		MINERVA
+	</generatedBy>
+	<version>
+		8.0.8.0
+	</version>
+	<user>
+		0 Unlimited
+	</user>
+	<kind>
+		TEST (20261027~20311027)
+	</kind>
+	<companyName>
+		엠투소프트
+	</companyName>
+	<core>
+		null
+	</core>
+	<volumeID>
+		null
+	</volumeID>
+	<exportType>
+		[mrr, xls, xlsx, csv, cell, pdf, png, jpg, tif, bmp, j2k, gif, hwp, ppt, pptx, doc, docx, txt, mrrml, xml, odt, odp, ods, rtf, html, html5, mrx, brl]
+	</exportType>
+	<serverType>
+		[DataServer(0), ReportingServer(1), DeliveryServer(2), MobileServer(3), RepositoryServer(4)]
+		[InfotalkServer(5), ReportPortal(6), ShareServer(7), FormServer(8), AdminConsole(9), ProxyServer(10)]
+	</serverType>
+	<serverSideViewerType>
+		[FlashViewer(0), HTML5Viewer(1)]
+	</serverSideViewerType>
+	<featureType>
+		[FormField, Note, Certification, MultiInstance, Spool]
+	</featureType>
+	<data>
+CwJQYwNgJQYQMgJQOAMQSwMQJQYgYRBgMwJQMgOQJQZhCgZhDwZgNREwNwJQMAOBExAgZgNBExBRBxHAOAbBDwOAMwRQVgJQZBGwZRAgNQYxCwYhABBQMxDQOQNQeAJQMQZgZBBhCgYQZBNAMAZQJQNxQQZhEgYxIhSgSxHBIgZBAgMhBQMBCgMREgMRGQYxHgORTAMgbBPhQQZRNgORGxDBPgNQRxCwMATBQgShBhTRNgMxSAMQYQUxExNAZgOBAgZRNAYxWxXxHgYRDQNwZgJQORDRHRaxEBiQYRHgYgMBLhDQYhiRTBihDwZRGQZBCgOAYgQxihGxkRYwMxiQOBdxEgORIAYQRhHxHBNgYhEgMhGwMRZxEhOQZQbxHBNBaAJQMxfAOASRSRSAYhCgYhRhEgZRBQMgMxQQORQQNRqBSBkQJQNQZQUwaBihSBERLhGxghLgZAdRLhDwYx0BDxwQJQZQMweR6wOQehjxAxDQOBqAZAdxAwNBnRIgYRIh7BGhPhGwMBGRzBlREwOBLQMQZBLSAxEBGRxx1wYgTQNQUBUh6xIhmRgBNRAxqBAgORzRiR5xLgNQaxihQxNgYx9BmxIgOAYwRSJRRxExkBNgZQOA
+	</data>
+</license>
