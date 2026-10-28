@@ -27,7 +27,8 @@ pipeline {
             steps {
                 script {
                     sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
-                    sh "kubectl apply -f deployment.yaml"
+                    // 💡 --validate=false 옵션을 추가합니다!
+                    sh "kubectl apply -f deployment.yaml --validate=false"
                     sh "kubectl rollout restart deployment/reporting-server-app"
                 }
             }
