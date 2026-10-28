@@ -39,21 +39,21 @@ pipeline {
                     // 1. 디플로이먼트 파일 이미지 태그 교체
                     sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
                     
-                    // 2. 인증서와 유저 정보를 날리지 않고, 내부 IP 서버 주소와 컨텍스트만 안전하게 설정
+                    // 2. kind 명령어로 인증서 + 컨텍스트가 모두 포함된 kubeconfig를 완전히 새로 생성하고 내부 IP로 교체
                     sh '''
                         KIND_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' kind-control-plane)
                         echo "Kind Control Plane IP: $KIND_IP"
                         
-                        CLUSTER_NAME=$(kubectl config get-clusters | awk 'NR>1 {print; exit}')
-                        echo "Target Cluster Name: $CLUSTER_NAME"
+                        mkdir -p /var/jenkins_home/.kube
                         
-                        # 서버 주소를 도커 내부 IP로 변경
+                        # kind 자체 명령어로 현재 킨드 클러스터의 온전한 config를 가져와서 덮어쓰기
+                        kind get kubeconfig --name kind > /var/jenkins_home/.kube/config
+                        
+                        # 서버 주소만 도커 내부 IP로 안전하게 교체
+                        CLUSTER_NAME=$(kubectl config get-clusters | awk 'NR>1 {print; exit}')
                         kubectl config set clusters.$CLUSTER_NAME.server https://$KIND_IP:6443
                         
-                        # 현재 컨텍스트를 kind-kind (또는 첫 번째 컨텍스트)로 강제 지정하여 인증 정보 활성화
-                        kubectl config use-context kind-kind || kubectl config use-context $(kubectl config get-contexts -o name | head -n 1)
-                        
-                        echo "===== Final Kubeconfig Validation ====="
+                        echo "===== Config Validation Success ====="
                         kubectl config current-context
                     '''
                     
