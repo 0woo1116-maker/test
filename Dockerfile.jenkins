@@ -23,9 +23,14 @@ RUN echo \
 # Docker CLI 설치
 RUN apt-get update && apt-get install -y docker-ce-cli
 
-# 💡 [여기 주석을 해제합니다!] kubectl 영구 설치
+# kubectl 설치
 RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
     && chmod +x kubectl && mv kubectl /usr/local/bin/kubectl
+
+# 💡 [여기 추가!] Kind CLI 영구 설치
+RUN curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.23.0/linux/amd64/kind \
+    && chmod +x ./kind \
+    && mv ./kind /usr/local/bin/kind
 
 # 기본 실행 유저 root 고정
 USER root
