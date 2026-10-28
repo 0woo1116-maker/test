@@ -39,27 +39,22 @@ pipeline {
                     // 1. 디플로이먼트 파일 이미지 태그 교체
                     sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
                     
-                    // 2. 킨드 설정 재가져오기 및 상세 디버깅 정보 출력
+                    // 2. 인증서와 유저 정보를 날리지 않고, 내부 IP 서버 주소와 컨텍스트만 안전하게 설정
                     sh '''
-                        echo "===== [DEBUG 1] Kind IP Check ====="
                         KIND_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' kind-control-plane)
                         echo "Kind Control Plane IP: $KIND_IP"
-                        
-                        echo "===== [DEBUG 2] Export Kubeconfig ====="
-                        kind export kubeconfig --name kind --kubeconfig /var/jenkins_home/.kube/config
                         
                         CLUSTER_NAME=$(kubectl config get-clusters | awk 'NR>1 {print; exit}')
                         echo "Target Cluster Name: $CLUSTER_NAME"
                         
+                        # 서버 주소를 도커 내부 IP로 변경
                         kubectl config set clusters.$CLUSTER_NAME.server https://$KIND_IP:6443
                         
-                        echo "===== [DEBUG 3] Final Kubeconfig View ====="
-                        kubectl config view --raw
+                        # 현재 컨텍스트를 kind-kind (또는 첫 번째 컨텍스트)로 강제 지정하여 인증 정보 활성화
+                        kubectl config use-context kind-kind || kubectl config use-context $(kubectl config get-contexts -o name | head -n 1)
                         
-                        echo "===== [DEBUG 4] Test API Connection via Curl ====="
-                        TOKEN=$(kubectl config view --raw -o jsonpath='{.users[0].user.token}')
-                        # 토큰이 없으면 인증서 방식으로 테스트
-                        curl -k -v https://$KIND_IP:6443/version || true
+                        echo "===== Final Kubeconfig Validation ====="
+                        kubectl config current-context
                     '''
                     
                     // 3. 쿠버네티스 배포 적용 및 재시작
