@@ -39,15 +39,15 @@ pipeline {
                     // 1. 디플로이먼트 파일 이미지 태그 교체
                     sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
                     
-                    // 2. 호스트의 꼬인 config를 쓰지 않고, 킨드에서 인증서를 직접 가져와서 내부 IP로 세팅
+                    // 2. 쉘 스크립트 주석을 #으로 수정하고 킨드 설정 재가져오기
                     sh '''
                         KIND_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' kind-control-plane)
                         echo "Kind Control Plane IP: $KIND_IP"
                         
-                        // 기존 인증 정보를 포함하여 킨드 클러스터 설정을 강제로 다시 가져옴
+                        # 기존 인증 정보를 포함하여 킨드 클러스터 설정을 강제로 다시 가져옴
                         kind export kubeconfig --name kind --kubeconfig /var/jenkins_home/.kube/config
                         
-                        // 서버 주소를 내부 IP:6443으로 교체
+                        # 서버 주소를 내부 IP:6443으로 교체
                         CLUSTER_NAME=$(kubectl config get-clusters | awk 'NR>1 {print; exit}')
                         kubectl config set clusters.$CLUSTER_NAME.server https://$KIND_IP:6443
                     '''
