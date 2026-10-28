@@ -35,8 +35,12 @@ pipeline {
                 script {
                     sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
                     
-                    // 💡 kind 클러스터를 바라보도록 컨텍스트 강제 지정 + --validate=false 적용
-                    sh "kubectl config use-context kind-kind"
+                    // 💡 현재 인식된 켄텍스트 목록을 로그로 출력해 확인
+                    sh "kubectl config get-contexts"
+                    
+                    // 일단 이 줄은 주석 처리하거나 빼고 실행해보기
+                    // sh "kubectl config use-context kind-kind"
+                    
                     sh "kubectl apply -f deployment.yaml --validate=false"
                     sh "kubectl rollout restart deployment/reporting-server-app"
                 }
