@@ -35,11 +35,15 @@ pipeline {
                 script {
                     sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
                     
-                    // 💡 --internal 옵션으로 컨테이너 내부 통신용 kubeconfig 생성
-                    sh "kind export kubeconfig --name kind --internal"
+                    // 1. kubeconfig 내보내기 (기본값으로 내보냄)
+                    sh "kind export kubeconfig --name kind"
                     
+                    // 💡 [핵심 해결] kubeconfig의 주소를 도커 내부에서 호스트를 바라보는 host.docker.internal:6443으로 강제 치환
+                    sh "sed -i 's|server: https://.*|server: https://host.docker.internal:6443|g' /var/jenkins_home/.kube/config"
+                    
+                    // 2. 쿠버네티스 배포 적용
                     sh "kubectl apply -f deployment.yaml --validate=false"
-                    sh "kubectl rollout rollout restart deployment/reporting-server-app" // rollout 오타 주의 (rollout restart)
+                    sh "kubectl rollout restart deployment/reporting-server-app"
                 }
             }
         }
