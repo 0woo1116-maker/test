@@ -39,16 +39,10 @@ pipeline {
                     // 1. 디플로이먼트 파일의 이미지 태그를 현재 빌드 번호로 교체
                     sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
                     
-                    // 2. sed를 쓰지 않고 kubectl 내장 명령어로 안전하게 클러스터 서버 주소만 변경 (YAML 손상 원천 차단)
+                    // 2. 킨드 기본 클러스터명(kind-kind)과 호스트 포트(6444)로 직접 세팅
                     sh '''
-                        CLUSTER_NAME=$(kubectl config view --minify -o jsonpath='{.clusters[0].name}')
-                        if [ -z "$CLUSTER_NAME" ]; then
-                            CLUSTER_NAME="kind-kind"
-                        fi
-                        echo "Target Cluster Name: $CLUSTER_NAME"
-                        
-                        // 호스트 포트 6444를 통해 Kind API 서버로 안전하게 연결 설정
-                        kubectl config set-cluster "$CLUSTER_NAME" --server=https://host.docker.internal:6444
+                        kubectl config set-cluster kind-kind --server=https://host.docker.internal:6444
+                        kubectl config use-context kind-kind
                     '''
                     
                     // 3. 쿠버네티스 배포 적용 및 재시작
