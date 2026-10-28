@@ -39,11 +39,11 @@ pipeline {
                     // 1. 디플로이먼트 파일의 이미지 태그를 현재 빌드 번호로 교체
                     sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
                     
-                    // 2. 등록된 클러스터 이름을 자동으로 찾아 서버 주소만 호스트 포트(6444)로 안전하게 변경
+                    // 2. clusters (복수형)로 수정하여 서버 주소 안전하게 변경
                     sh '''
                         CLUSTER_NAME=$(kubectl config get-clusters | awk 'NR>1 {print; exit}')
                         echo "Target Cluster: $CLUSTER_NAME"
-                        kubectl config set cluster.$CLUSTER_NAME.server https://host.docker.internal:6444
+                        kubectl config set clusters.$CLUSTER_NAME.server https://host.docker.internal:6444
                     '''
                     
                     // 3. 쿠버네티스 배포 적용 및 재시작
