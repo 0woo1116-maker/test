@@ -39,11 +39,11 @@ pipeline {
                     // 1. 디플로이먼트 파일의 이미지 태그를 현재 빌드 번호로 교체
                     sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
                     
-                    // 2. clusters (복수형)로 수정하여 서버 주소 안전하게 변경
+                    // 2. 호스트 포트(6444) 대신 도커 내부망 주소(kind-control-plane:6443)로 직접 다이렉트 연결
                     sh '''
                         CLUSTER_NAME=$(kubectl config get-clusters | awk 'NR>1 {print; exit}')
                         echo "Target Cluster: $CLUSTER_NAME"
-                        kubectl config set clusters.$CLUSTER_NAME.server https://host.docker.internal:6444
+                        kubectl config set clusters.$CLUSTER_NAME.server https://kind-control-plane:6443
                     '''
                     
                     // 3. 쿠버네티스 배포 적용 및 재시작
