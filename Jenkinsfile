@@ -39,22 +39,43 @@ pipeline {
                     // 1. 디플로이먼트 파일 이미지 태그 교체
                     sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
                     
-                    // 2. kind 명령어로 인증서 + 컨텍스트가 모두 포함된 kubeconfig를 완전히 새로 생성하고 내부 IP로 교체
+                    // 2. 킨드 컨트롤 플레인의 인증서를 추출하여 완벽한 kubeconfig를 직접 작성
                     sh '''
                         KIND_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' kind-control-plane)
                         echo "Kind Control Plane IP: $KIND_IP"
                         
                         mkdir -p /var/jenkins_home/.kube
                         
-                        # kind 자체 명령어로 현재 킨드 클러스터의 온전한 config를 가져와서 덮어쓰기
-                        kind get kubeconfig --name kind > /var/jenkins_home/.kube/config
+                        # 킨드 컨트롤 플레인 컨테이너 내부에서 인증서/키 데이터를 직접 추출하여 젠킨스용 kubeconfig를 정석으로 생성
+                        CA_DATA=$(docker exec kind-control-plane cat /etc/kubernetes/pki/ca.crt | base64 | tr -d '\\n')
+                        CLIENT_CERT_DATA=$(docker exec kind-control-plane cat /etc/kubernetes/pki/apiserver-kubelet-client.crt | base64 | tr -d '\\n')
+                        CLIENT_KEY_DATA=$(docker exec kind-control-plane cat /etc/kubernetes/pki/apiserver-kubelet-client.key | base64 | tr -d '\\n')
                         
-                        # 서버 주소만 도커 내부 IP로 안전하게 교체
-                        CLUSTER_NAME=$(kubectl config get-clusters | awk 'NR>1 {print; exit}')
-                        kubectl config set clusters.$CLUSTER_NAME.server https://$KIND_IP:6443
-                        
-                        echo "===== Config Validation Success ====="
+                        cat <<EOF > /var/jenkins_home/.kube/config
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: ${CA_DATA}
+    server: https://${KIND_IP}:6443
+  name: kind-kind
+contexts:
+- context:
+    cluster: kind-kind
+    user: kind-kind
+  name: kind-kind
+current-context: kind-kind
+kind: Config
+preferences: {}
+users:
+- name: kind-kind
+  user:
+    client-certificate-data: ${CLIENT_CERT_DATA}
+    client-key-data: ${CLIENT_KEY_DATA}
+EOF
+
+                        echo "===== Final Config Validation ====="
                         kubectl config current-context
+                        kubectl cluster-info
                     '''
                     
                     // 3. 쿠버네티스 배포 적용 및 재시작
