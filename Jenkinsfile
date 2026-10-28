@@ -31,16 +31,17 @@ pipeline {
         }
 
         stage('Kubernetes Deploy') {
-         steps {
-             script {
-                 sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
-
-                 // 이제 컨텍스트가 정상적으로 조회되므로 이 명령어가 정상 작동합니다!
-                 sh "kubectl config use-context kind-kind"
-                 sh "kubectl apply -f deployment.yaml --validate=false"
-                 sh "kubectl rollout restart deployment/reporting-server-app"
-             }
-         }
-     }
+            steps {
+                script {
+                    sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
+                    
+                    // 💡 호스트의 kind 클러스터 정보를 젠킨스 내부에 직접 생성하고 컨텍스트로 지정
+                    sh "kind export kubeconfig --name kind"
+                    
+                    sh "kubectl apply -f deployment.yaml --validate=false"
+                    sh "kubectl rollout restart deployment/reporting-server-app"
+                }
+            }
+        }
     }
 }
