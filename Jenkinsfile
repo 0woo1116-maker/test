@@ -39,10 +39,11 @@ pipeline {
                     // 1. 디플로이먼트 파일의 이미지 태그를 현재 빌드 번호로 교체
                     sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
                     
-                    // 2. 킨드 기본 클러스터명(kind-kind)과 호스트 포트(6444)로 직접 세팅
+                    // 2. 등록된 클러스터 이름을 자동으로 찾아 서버 주소만 호스트 포트(6444)로 안전하게 변경
                     sh '''
-                        kubectl config set-cluster kind-kind --server=https://host.docker.internal:6444
-                        kubectl config use-context kind-kind
+                        CLUSTER_NAME=$(kubectl config get-clusters | awk 'NR>1 {print; exit}')
+                        echo "Target Cluster: $CLUSTER_NAME"
+                        kubectl config set cluster.$CLUSTER_NAME.server https://host.docker.internal:6444
                     '''
                     
                     // 3. 쿠버네티스 배포 적용 및 재시작
