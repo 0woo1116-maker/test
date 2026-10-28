@@ -11,5 +11,5 @@ nodes:
         protocol: TCP
       # 💡 API 서버 포트(6443)도 호스트와 매핑되도록 추가
       - containerPort: 6443
-        hostPort: 6443
+        hostPort: 6444
         protocol: TCP
