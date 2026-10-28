@@ -15,7 +15,7 @@ spec:
       containers:
       - name: reporting-server
         image: reporting-server:latest
-        imagePullPolicy: Always
+        imagePullPolicy: Never
         ports:
         - containerPort: 8080
 ---
