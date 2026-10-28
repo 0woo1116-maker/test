@@ -35,10 +35,10 @@ pipeline {
                 script {
                     sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
                     
-                    // 💡 핵심: export 명령어를 쓰면 127.0.0.1로 덮어씌워지므로 절대 쓰지 않고,
-                    // 무조건 host.docker.internal:6444(우리가 뚫어놓은 고정 포트)로 강제 치환합니다.
-                    sh "sed -i 's|server: https://.*|server: https://host.docker.internal:6444|g' /var/jenkins_home/.kube/config"
-                    
+                    // 💡 핵심: 호스트 포트(6444)가 아니라, 
+                    // 젠킨스와 킨드가 공유하는 도커 네트워크 내부 주소(kind-control-plane:6443)로 직접 찌릅니다!
+                    sh "sed -i 's|server: https://.*|server: https://kind-control-plane:6443|g' /var/jenkins_home/.kube/config"
+
                     // 쿠버네티스 배포 적용
                     sh "kubectl apply -f deployment.yaml --validate=false"
                     sh "kubectl rollout restart deployment/reporting-server-app"
