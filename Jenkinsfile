@@ -35,13 +35,12 @@ pipeline {
                 script {
                     sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
                     
-                    // 1. kubeconfig 내보내기 (기본값으로 내보냄)
-                    sh "kind export kubeconfig --name kind"
-                    
-                    // 💡 [핵심 해결] kubeconfig의 주소를 도커 내부에서 호스트를 바라보는 host.docker.internal:6443으로 강제 치환
-                    sh "sed -i 's|server: https://.*|server: https://host.docker.internal:6443|g' /var/jenkins_home/.kube/config"
-                    
-                    // 2. 쿠버네티스 배포 적용
+                    // 💡 export 명령어를 쓰지 않고, 마운트된 쿠버네티스 설정 경로를 명시하거나 바로 적용
+                    // 컨테이너 구동 시 -v C:\Users\M2S\.kube:/var/jenkins_home/.kube 로 연결되어 있으므로
+                    // 호스트에 이미 정상 설정된 kubeconfig를 환경 변수로 바로 지정해 줍니다.
+                    env.KUBECONFIG = "/var/jenkins_home/.kube/config"
+
+                    // 바로 쿠버네티스 배포 적용
                     sh "kubectl apply -f deployment.yaml --validate=false"
                     sh "kubectl rollout restart deployment/reporting-server-app"
                 }
