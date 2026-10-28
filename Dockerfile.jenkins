@@ -16,16 +16,12 @@ RUN curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /
 
 RUN echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
-  $(lsb_release -cs) stable" | tee /etc/apt/etc/apt/sources.list.d/docker.list > /dev/null || \
+  $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null || \
   echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
   bookworm stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 # Docker CLI 설치 (도커 데몬은 호스트의 것을 소켓으로 공유해서 사용)
 RUN apt-get update && apt-get install -y docker-ce-cli
 
-# (선택) kubectl도 컨테이너 안에 영구적으로 넣고 싶다면 아래 주석을 해제하세요
-# RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
-#     && chmod +x kubectl && mv kubectl /usr/local/bin/kubectl
-
-# 다시 안전한 jenkins 유저로 복귀
-USER jenkins
+# 기본 실행 유저를 root로 고정하여 재부팅 후에도 도커 권한 문제 방지
+USER root
