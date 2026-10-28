@@ -39,17 +39,27 @@ pipeline {
                     // 1. 디플로이먼트 파일 이미지 태그 교체
                     sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
                     
-                    // 2. 쉘 스크립트 주석을 #으로 수정하고 킨드 설정 재가져오기
+                    // 2. 킨드 설정 재가져오기 및 상세 디버깅 정보 출력
                     sh '''
+                        echo "===== [DEBUG 1] Kind IP Check ====="
                         KIND_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' kind-control-plane)
                         echo "Kind Control Plane IP: $KIND_IP"
                         
-                        # 기존 인증 정보를 포함하여 킨드 클러스터 설정을 강제로 다시 가져옴
+                        echo "===== [DEBUG 2] Export Kubeconfig ====="
                         kind export kubeconfig --name kind --kubeconfig /var/jenkins_home/.kube/config
                         
-                        # 서버 주소를 내부 IP:6443으로 교체
                         CLUSTER_NAME=$(kubectl config get-clusters | awk 'NR>1 {print; exit}')
+                        echo "Target Cluster Name: $CLUSTER_NAME"
+                        
                         kubectl config set clusters.$CLUSTER_NAME.server https://$KIND_IP:6443
+                        
+                        echo "===== [DEBUG 3] Final Kubeconfig View ====="
+                        kubectl config view --raw
+                        
+                        echo "===== [DEBUG 4] Test API Connection via Curl ====="
+                        TOKEN=$(kubectl config view --raw -o jsonpath='{.users[0].user.token}')
+                        # 토큰이 없으면 인증서 방식으로 테스트
+                        curl -k -v https://$KIND_IP:6443/version || true
                     '''
                     
                     // 3. 쿠버네티스 배포 적용 및 재시작
