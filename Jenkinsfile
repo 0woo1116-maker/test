@@ -31,20 +31,16 @@ pipeline {
         }
 
         stage('Kubernetes Deploy') {
-            steps {
-                script {
-                    sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
-                    
-                    // 💡 현재 인식된 켄텍스트 목록을 로그로 출력해 확인
-                    sh "kubectl config get-contexts"
-                    
-                    // 일단 이 줄은 주석 처리하거나 빼고 실행해보기
-                    // sh "kubectl config use-context kind-kind"
-                    
-                    sh "kubectl apply -f deployment.yaml --validate=false"
-                    sh "kubectl rollout restart deployment/reporting-server-app"
-                }
-            }
-        }
+         steps {
+             script {
+                 sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
+
+                 // 이제 컨텍스트가 정상적으로 조회되므로 이 명령어가 정상 작동합니다!
+                 sh "kubectl config use-context kind-kind"
+                 sh "kubectl apply -f deployment.yaml --validate=false"
+                 sh "kubectl rollout restart deployment/reporting-server-app"
+             }
+         }
+     }
     }
 }
