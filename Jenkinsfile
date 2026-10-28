@@ -39,18 +39,22 @@ pipeline {
                     // 1. 디플로이먼트 파일 이미지 태그 교체
                     sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
                     
-                    // 2. 킨드 컨트롤 플레인의 인증서를 추출하여 완벽한 kubeconfig를 직접 작성
+                    // 2. KUBECONFIG 경로를 명시적으로 고정하고 인증서와 컨텍스트가 포함된 config 파일 생성
                     sh '''
+                        # 0순위로 kubectl이 참조할 설정 파일 경로를 절대 경로로 고정
+                        export KUBECONFIG=/var/jenkins_home/.kube/config
+                        
                         KIND_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' kind-control-plane)
                         echo "Kind Control Plane IP: $KIND_IP"
                         
                         mkdir -p /var/jenkins_home/.kube
                         
-                        # 킨드 컨트롤 플레인 컨테이너 내부에서 인증서/키 데이터를 직접 추출하여 젠킨스용 kubeconfig를 정석으로 생성
+                        # 킨드 컨트롤 플레인 내부에서 인증서 추출
                         CA_DATA=$(docker exec kind-control-plane cat /etc/kubernetes/pki/ca.crt | base64 | tr -d '\\n')
                         CLIENT_CERT_DATA=$(docker exec kind-control-plane cat /etc/kubernetes/pki/apiserver-kubelet-client.crt | base64 | tr -d '\\n')
                         CLIENT_KEY_DATA=$(docker exec kind-control-plane cat /etc/kubernetes/pki/apiserver-kubelet-client.key | base64 | tr -d '\\n')
                         
+                        # KUBECONFIG 파일 직접 작성
                         cat <<EOF > /var/jenkins_home/.kube/config
 apiVersion: v1
 clusters:
@@ -78,9 +82,12 @@ EOF
                         kubectl cluster-info
                     '''
                     
-                    // 3. 쿠버네티스 배포 적용 및 재시작
-                    sh "kubectl apply -f deployment.yaml --validate=false"
-                    sh "kubectl rollout restart deployment/reporting-server-app"
+                    // 3. 쿠버네티스 배포 적용 및 재시작 (동일하게 KUBECONFIG 환경변수 유지)
+                    sh '''
+                        export KUBECONFIG=/var/jenkins_home/.kube/config
+                        kubectl apply -f deployment.yaml --validate=false
+                        kubectl rollout restart deployment/reporting-server-app
+                    '''
                 }
             }
         }
