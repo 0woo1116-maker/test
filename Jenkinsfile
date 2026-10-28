@@ -35,9 +35,14 @@ pipeline {
                 script {
                     sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
                     
-                    // 💡 호스트의 kind 클러스터 정보를 젠킨스 내부에 직접 생성하고 컨텍스트로 지정
+                    // 1. kubeconfig 내보내기
                     sh "kind export kubeconfig --name kind"
                     
+                    // 💡 [핵심 추가] 젠킨스 컨테이너 내부에서 호스트/컨트롤플레인으로 접근할 수 있도록 주소 변환
+                    // (kind-control-plane 컨테이너 이름 또는 내부 네트워크 IP로 매핑)
+                    sh "sed -i 's/127\\.0\\.0\\.1/kind-control-plane/g' /var/jenkins_home/.kube/config"
+                    
+                    // 2. 쿠버네티스 배포 적용
                     sh "kubectl apply -f deployment.yaml --validate=false"
                     sh "kubectl rollout restart deployment/reporting-server-app"
                 }
