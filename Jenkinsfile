@@ -39,11 +39,13 @@ pipeline {
                     // 1. 디플로이먼트 파일의 이미지 태그를 현재 빌드 번호로 교체
                     sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
                     
-                    // 2. 호스트 포트(6444) 대신 도커 내부망 주소(kind-control-plane:6443)로 직접 다이렉트 연결
+                    // 2. kind-control-plane의 도커 내부 IP를 직접 조회해서 kubeconfig의 서버 주소로 강제 주입
                     sh '''
+                        KIND_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' kind-control-plane)
+                        echo "Kind Control Plane IP: $KIND_IP"
+                        
                         CLUSTER_NAME=$(kubectl config get-clusters | awk 'NR>1 {print; exit}')
-                        echo "Target Cluster: $CLUSTER_NAME"
-                        kubectl config set clusters.$CLUSTER_NAME.server https://kind-control-plane:6443
+                        kubectl config set clusters.$CLUSTER_NAME.server https://$KIND_IP:6443
                     '''
                     
                     // 3. 쿠버네티스 배포 적용 및 재시작
