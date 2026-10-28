@@ -39,18 +39,16 @@ pipeline {
                     // 1. 디플로이먼트 파일 이미지 태그 교체
                     sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
                     
-                    // 2. Kind 관리자 권한이 포함된 kubeconfig를 생성하고 내부 IP로 서버 주소 변경
+                    // 2. 젠킨스 전용 kubeconfig 경로를 분리 (/tmp 사용으로 호스트 설정 보호)
                     sh '''
-                        export KUBECONFIG=/var/jenkins_home/.kube/config
+                        export KUBECONFIG=/tmp/jenkins-kind-config
                         KIND_IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' kind-control-plane)
                         echo "Kind Control Plane IP: $KIND_IP"
                         
-                        mkdir -p /var/jenkins_home/.kube
+                        # 젠킨스 전용 경로에 킨드 설정 추출
+                        kind get kubeconfig --name kind > /tmp/jenkins-kind-config
                         
-                        # Kind 관리자용(kubernetes-admin) 순정 kubeconfig 추출 및 저장
-                        kind get kubeconfig --name kind > /var/jenkins_home/.kube/config
-                        
-                        # 서버 주소만 도커 내부 IP로 안전하게 교체
+                        # 젠킨스 전용 파일의 서버 주소만 도커 내부 IP로 교체 (호스트 파일은 안전함!)
                         kubectl config set clusters.kind-kind.server https://${KIND_IP}:6443
                         
                         echo "===== Final Config Validation ====="
@@ -58,9 +56,9 @@ pipeline {
                         kubectl cluster-info
                     '''
                     
-                    // 3. 쿠버네티스 배포 적용 및 재시작
+                    // 3. 젠킨스 전용 KUBECONFIG를 사용해 배포 적용
                     sh '''
-                        export KUBECONFIG=/var/jenkins_home/.kube/config
+                        export KUBECONFIG=/tmp/jenkins-kind-config
                         kubectl apply -f deployment.yaml --validate=false
                         kubectl rollout restart deployment/reporting-server-app
                     '''
