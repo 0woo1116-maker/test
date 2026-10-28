@@ -35,8 +35,8 @@ pipeline {
                 script {
                     sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
                     
-                    // 💡 kubeconfig 파일 내의 서버 주소를 도커 호스트 접근 주소(host.docker.internal:6444)로 강제 치환
-                    sh "sed -i 's|server: https://.*|server: https://host.docker.internal:6444|g' /var/jenkins_home/.kube/config"
+                    // 💡 도커 내부 네트워크망을 통해 Kind API 서버로 직접 통신
+                    sh "sed -i 's|server: https://.*|server: https://kind-control-plane:6443|g' /var/jenkins_home/.kube/config"
                     
                     // 쿠버네티스 배포 적용
                     sh "kubectl apply -f deployment.yaml --validate=false"
