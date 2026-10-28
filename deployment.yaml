@@ -29,6 +29,6 @@ spec:
     app: reporting-server
   ports:
     - protocol: TCP
-      port: 80
+      port: 8080          # 수정: 80 -> 8080
       targetPort: 8080
       nodePort: 30080
