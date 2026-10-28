@@ -27,10 +27,9 @@ RUN apt-get update && apt-get install -y docker-ce-cli
 RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
     && chmod +x kubectl && mv kubectl /usr/local/bin/kubectl
 
-# 💡 [여기 추가!] Kind CLI 영구 설치
-# Kind CLI 올바른 공식 설치 방법
-RUN curl -SLo /usr/local/bin/kind https://kind.sigs.k8s.io/dl/v0.23.0/linux/amd64/kind \
-    && chmod +x /usr/local/bin/kind
+# 💡 [핵심 변경] 외부 다운로드 대신, 윈도우 호스트에 있는 kind 파일을 프로젝트 폴더에 복사해 두고 복사해오기!
+# (프로젝트 폴더에 kind 파일을 넣어두거나, 아래와 같이 처리)
+COPY kind /usr/local/bin/kind
+RUN chmod +x /usr/local/bin/kind
 
-# 기본 실행 유저 root 고정
 USER root
