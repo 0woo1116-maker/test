@@ -39,29 +39,16 @@ pipeline {
                     // 1. 디플로이먼트 파일의 이미지 태그를 현재 빌드 번호로 교체
                     sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
                     
-                    // 2. kubeconfig 파일을 루프백(127.0.0.1) 없이 내부망 주소로 완전히 새로 작성
+                    // 2. sed를 쓰지 않고 kubectl 내장 명령어로 안전하게 클러스터 서버 주소만 변경 (YAML 손상 원천 차단)
                     sh '''
-                        mkdir -p /var/jenkins_home/.kube
-                        cat <<EOF > /var/jenkins_home/.kube/config
-apiVersion: v1
-clusters:
-- cluster:
-    server: https://kind-control-plane:6443
-  name: kind-kind
-contexts:
-- context:
-    cluster: kind-kind
-    user: kind-kind
-  name: kind-kind
-current-context: kind-kind
-kind: Config
-preferences: {}
-users:
-- name: kind-kind
-  user:
-    client-certificate-data: $(kubectl config view --raw -o jsonpath='{.users[0].user.client-certificate-data}')
-    client-key-data: $(kubectl config view --raw -o jsonpath='{.users[0].user.client-key-data}')
-EOF
+                        CLUSTER_NAME=$(kubectl config view --minify -o jsonpath='{.clusters[0].name}')
+                        if [ -z "$CLUSTER_NAME" ]; then
+                            CLUSTER_NAME="kind-kind"
+                        fi
+                        echo "Target Cluster Name: $CLUSTER_NAME"
+                        
+                        // 호스트 포트 6444를 통해 Kind API 서버로 안전하게 연결 설정
+                        kubectl config set-cluster "$CLUSTER_NAME" --server=https://host.docker.internal:6444
                     '''
                     
                     // 3. 쿠버네티스 배포 적용 및 재시작
