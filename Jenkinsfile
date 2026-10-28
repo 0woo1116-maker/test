@@ -27,7 +27,11 @@ pipeline {
             steps {
                 script {
                     sh "sed -i 's|image: reporting-server:.*|image: reporting-server:${BUILD_NUMBER}|g' deployment.yaml"
-                    // 💡 --validate=false 옵션을 추가합니다!
+                    
+                    // 💡 핵심: 젠킨스가 kind 클러스터를 바라보도록 컨텍스트를 강제로 전환합니다!
+                    sh "kubectl config use-context kind-kind"
+                    
+                    // 기존 배포 명령어 실행 (--validate=false 유지)
                     sh "kubectl apply -f deployment.yaml --validate=false"
                     sh "kubectl rollout restart deployment/reporting-server-app"
                 }
