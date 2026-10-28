@@ -1,15 +1,13 @@
 ﻿kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
-networking:
-  apiServerAddress: "0.0.0.0" # 외부(도커 네트워크 포함)에서 접근 허용
-  apiServerPort: 6443
 nodes:
   - role: control-plane
     extraPortMappings:
+      # 1. 앱(ReportingServer) 접속을 위한 30080 포트 (유지 필수!)
       - containerPort: 30080
         hostPort: 30080
         protocol: TCP
-      # 💡 API 서버 포트(6443)도 호스트와 매핑되도록 추가
+      # 2. 젠킨스 연동을 위한 6443 -> 6444 포트[cite: 2, 3]
       - containerPort: 6443
         hostPort: 6444
         protocol: TCP
