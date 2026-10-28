@@ -1,9 +1,9 @@
 FROM jenkins/jenkins:lts
 
-# root 권한으로 전환하여 패키지 설치 준비
+# root 권한으로 전환
 USER root
 
-# 필수 패키지 및 도커 공식 리포지토리 추가 준비
+# 필수 패키지 설치
 RUN apt-get update && apt-get install -y \
     ca-certificates \
     curl \
@@ -20,8 +20,12 @@ RUN echo \
   echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
   bookworm stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-# Docker CLI 설치 (도커 데몬은 호스트의 것을 소켓으로 공유해서 사용)
+# Docker CLI 설치
 RUN apt-get update && apt-get install -y docker-ce-cli
 
-# 기본 실행 유저를 root로 고정하여 재부팅 후에도 도커 권한 문제 방지
+# 💡 [여기 주석을 해제합니다!] kubectl 영구 설치
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
+    && chmod +x kubectl && mv kubectl /usr/local/bin/kubectl
+
+# 기본 실행 유저 root 고정
 USER root
