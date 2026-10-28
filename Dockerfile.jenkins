@@ -28,9 +28,9 @@ RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/s
     && chmod +x kubectl && mv kubectl /usr/local/bin/kubectl
 
 # 💡 [여기 추가!] Kind CLI 영구 설치
-RUN curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.23.0/linux/amd64/kind \
-    && chmod +x ./kind \
-    && mv ./kind /usr/local/bin/kind
+# Kind CLI 올바른 공식 설치 방법
+RUN curl -SLo /usr/local/bin/kind https://kind.sigs.k8s.io/dl/v0.23.0/linux/amd64/kind \
+    && chmod +x /usr/local/bin/kind
 
 # 기본 실행 유저 root 고정
 USER root
