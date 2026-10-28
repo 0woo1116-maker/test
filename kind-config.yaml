@@ -1,8 +1,15 @@
 ﻿kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
+networking:
+  apiServerAddress: "0.0.0.0" # 외부(도커 네트워크 포함)에서 접근 허용
+  apiServerPort: 6443
 nodes:
-- role: control-plane
-  extraPortMappings:
-  - containerPort: 30080
-    hostPort: 30080
-    protocol: TCP
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 30080
+        hostPort: 30080
+        protocol: TCP
+      # 💡 API 서버 포트(6443)도 호스트와 매핑되도록 추가
+      - containerPort: 6443
+        hostPort: 6443
+        protocol: TCP
